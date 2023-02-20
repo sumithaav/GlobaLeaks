@@ -2,6 +2,7 @@
 #
 # Handlers dealing with tip interface for receivers (rtip)
 import base64
+import mimetypes
 import os
 
 from datetime import datetime
@@ -652,6 +653,7 @@ class ReceiverFileDownload(BaseHandler):
 
     @transact
     def download_rfile(self, session, tid, user_id, file_id):
+        print("===>")
         rfile, ifile, rtip, pgp_key = db_get(session,
                                              (models.ReceiverFile,
                                               models.InternalFile,
@@ -673,8 +675,21 @@ class ReceiverFileDownload(BaseHandler):
 
     @inlineCallbacks
     def get(self, rfile_id):
-        name, filename, tip_prv_key, files_prv_key, pgp_key = yield self.download_rfile(self.request.tid, self.session.user_id, rfile_id)
+        # get query arguments from request
 
+
+        # view = self.request.args.get[b'view']
+        if b'view' in self.request.args:
+            view_arg = self.request.args.get(b'view')
+            print("VIEW ARG ==>", view_arg[0])
+            is_view = True if view_arg and view_arg[0] == b'1' else False
+        else: 
+            is_view = False
+
+        print("VIEW ==>", is_view)
+        # TODO add view functionality here
+
+        name, filename, tip_prv_key, files_prv_key, pgp_key = yield self.download_rfile(self.request.tid, self.session.user_id, rfile_id)
         filelocation = os.path.join(self.state.settings.attachments_path, filename)
         directory_traversal_check(self.state.settings.attachments_path, filelocation)
 
@@ -689,6 +704,26 @@ class ReceiverFileDownload(BaseHandler):
             pgp_key = ''
             name += ".pgp"
 
+        # find mimetype based on file extension
+        if is_view:
+            mimetype = mimetypes.guess_type(name)[0]
+            allowed_mimetypes = [
+            'audio/mpeg', #mp3
+            'application/pdf',
+            'image/gif',
+            'image/jpeg',
+            'image/png',
+            'image/x-icon',
+            'video/mp4'
+        ]
+            print("==> Requested mime type: %s" % mimetype)
+            if mimetype not in allowed_mimetypes:
+                print("==> Mimetype not allowed")
+                raise errors.ForbiddenOperation
+            else:
+                print("==> Mimetype allowed")
+                yield self.write_file_as_download(name, filelocation, pgp_key,mimetype)
+        
         yield self.write_file_as_download(name, filelocation, pgp_key)
 
 

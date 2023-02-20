@@ -335,6 +335,7 @@ factory("RTipMessageResource", ["GLResource", function(GLResource) {
 }]).
 factory("RTipDownloadRFile", ["Utils", function(Utils) {
   return function(file) {
+  console.log("am here in factory",Utils);
     Utils.download("api/rfile/" + file.id);
   };
 }]).
@@ -1024,6 +1025,26 @@ factory("Utils", ["$rootScope", "$http", "$q", "$location", "$filter", "$uibModa
       return modal.result;
     },
 
+     openViewModalDialog: function(template, arg, scope) {
+      scope = !scope ? $rootScope : scope;
+
+      var modal = $uibModal.open({
+        templateUrl: template,
+        controller: "ViewModalCtrl",
+        scope: scope,
+        resolve: {
+          arg: function () {
+            return arg;
+          },
+          confirmFun: null,
+          cancelFun: null
+        }
+      });
+
+
+      return modal.result;
+    },
+
     deleteDialog: function() {
       return this.openConfirmableModalDialog("views/modals/delete_confirmation.html");
     },
@@ -1073,6 +1094,26 @@ factory("Utils", ["$rootScope", "$http", "$q", "$location", "$filter", "$uibModa
     download: function(url) {
       return new TokenResource().$get().then(function(token) {
         $window.open(url + "?token=" + token.id + ":" + token.answer);
+      });
+    },
+
+    view: function(url, callback) {
+      return new TokenResource().$get().then(function(token) {
+        // TODO The callback return the file url 
+        callback(url + "?token=" + token.id + ":" + token.answer + "&view=1");
+        // TODO remove the rest of the items
+        // $http.get(url + "?token=" + token.id + ":" + token.answer, {responseType: "arraybuffer"}).then(function(response){
+        //   console.log("from view response",response);
+        //   // callback(response.data);
+        //   var base64Data = btoa(String.fromCharCode.apply(null, new Uint8Array(response.data)));
+        //   console.log("==>", base64Data);
+          
+        //   callback(base64Data);
+        // }, function(response) {
+        //   // handle error
+        //   console.log(response.status);
+        // });
+        // $window.open(url + "?token=" + token.id + ":" + token.answer);
       });
     },
 
@@ -1275,6 +1316,12 @@ factory("Utils", ["$rootScope", "$http", "$q", "$location", "$filter", "$uibModa
       }
 
       return $http.post("api/exception", scrub(exception));
+    },
+    isImage: function(mimeType){
+      var imageMimes = ["image/jpeg", "image/png", "image/gif", "image/bmp", "image/webp", "image/tiff", "image/x-icon"];
+      return imageMimes.some(function(imageMime) {
+          return mimeType.startsWith(imageMime);
+      });
     }
   };
 }]).
@@ -1760,5 +1807,22 @@ factory("GLTranslate", ["$translate", "$location", "$window", "tmhDynamicLocale"
       facts.userPreference = lang;
       determineLanguage();
     },
+  };
+}]).
+factory("RTipViewRFile", ["Utils", function(Utils) {
+  return function(file) {
+  console.log("Am in view file",file);
+    // Utils.download("api/rfile/" + file.id);
+    Utils.view("api/rfile/" + file.id, function (data){
+      Utils.openViewModalDialog("views/modals/file_view.html", {
+          url: data,
+          filename: file.name,
+          type: file.type,
+          size: file.size,
+          creation_date: file.creation_date,
+      });
+    });
+
+   
   };
 }]);

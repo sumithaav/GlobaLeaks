@@ -501,9 +501,11 @@ class APIResourceWrapper(Resource):
                               b"default-src 'none';"
                               b"font-src 'self' data:;"
                               b"form-action 'none';"
-                              b"frame-ancestors 'none';"
+                              b"frame-ancestors 'self';"
                               b"img-src 'self' data:;"
                               b"media-src 'self';"
+                              b"object-src 'self';"
+                              b"frame-src 'self';"
                               b"script-src 'self' 'sha256-l4srTx31TC+tE2K4jVVCnC9XfHivkiSs/v+DPWccDDM=';"
                               b"style-src 'self' 'sha256-fwyo2zCGlh85NfN4rQUlpLM7MB5cry/1AEDA/G9mQJ8=';")
 
@@ -519,7 +521,7 @@ class APIResourceWrapper(Resource):
                                                  b"microphone=()")
 
         # Prevent old browsers not supporting CSP frame-ancestors directive to includes the platform within an iframe
-        request.setHeader(b'X-Frame-Options', b'deny')
+        # request.setHeader(b'X-Frame-Options', b'deny')
 
         # Prevent the browsers to implement automatic mime type detection and execution.
         request.setHeader(b'X-Content-Type-Options', b'nosniff')

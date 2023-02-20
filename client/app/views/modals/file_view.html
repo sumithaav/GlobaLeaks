@@ -1,0 +1,43 @@
+<div class="modal-header">
+  <div class="modal-title">
+    <h2>{{arg.filename}}</h2>
+    <!-- <p>{{arg.type}} | {{arg.size | byteFmt:2}}</p> -->
+  </div>
+  <button type="button" class="close" data-ng-click="cancel()">
+    <i class="fa-solid fa-times"></i>
+  </button>
+</div>
+<div class="modal-body" data-ng-init="sent=false; arg.mail_address=resources.preferences.mail_address">
+  <div data-ng-switch="getFileTag(arg.type)">
+    <div data-ng-switch-when="image">
+      <img class="img-fluid" data-ng-src="{{arg.url}}" />
+    </div>
+    <div data-ng-switch-when="pdf">
+        <embed style="height:60vh" width="100%" data-ng-src="{{arg.url + '#toolbar=0&navpanes=0'}}" toolbar="0" type="application/pdf" />
+    </div>
+    <div data-ng-switch-when="video">
+      <video controls width="100%">
+        <source data-ng-src="{{arg.url}}" type="{{arg.type}}" />
+        <div class="alert alert-danger" data-translate>Unsupported file type</div>
+    </div>
+    <div data-ng-switch-when="audio">
+      <audio controls>
+        <source data-ng-src="{{arg.url}}" type="{{arg.type}}" />
+        <div class="alert alert-danger" data-translate>Unsupported file type</div>
+    </div>
+    <div data-ng-switch-default>
+      <div class="alert alert-danger" data-translate>Unsupported file type</div>
+    </div>
+
+  </div>
+
+</div>
+<div class="modal-footer">
+  <!-- <button id="modal-action-ok" class="btn btn-primary" data-ng-hide="sent" data-ng-disabled="SupportRequest.$invalid" data-ng-click="sent=true; Utils.submitSupportRequest(arg);">
+    <span data-translate>Submit</span>
+  </button> -->
+  <a id="modal-action-cancel" class="btn btn-outline-secondary" data-ng-click="cancel()">
+    <i class="fa-solid fa-times"></i>
+    <span data-translate>Close</span>
+  </a>
+</div>
