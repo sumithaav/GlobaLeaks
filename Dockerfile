@@ -23,4 +23,6 @@ RUN pip3 install -r requirements/requirements-jammy.txt
 
 RUN alias python='python3'
 
-CMD ["bin/globaleaks"," -z","-n"]
+WORKDIR /app
+
+CMD ["/backend/bin/globaleaks"," -z","-n"]
