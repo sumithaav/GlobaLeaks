@@ -1,0 +1,16 @@
+{
+    "name": "Profile Name 1",
+    "description": "Profile description goes here",
+    "config": {
+      "acme": false,
+      "acme_accnt_key": "",
+      "adminonly": false,
+      "allow_indexing": true,
+      "anonymize_outgoing_connections": false,
+      "counter_submissions": 0,
+      "custom_support_url": "",
+      "crypto_escrow_prv_key": "",
+      "crypto_escrow_pub_key": ""
+    }
+  }
+  
